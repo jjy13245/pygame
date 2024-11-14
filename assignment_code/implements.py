@@ -31,12 +31,14 @@ class Block(Basic):
         self.alive = alive
 
     def draw(self, surface) -> None:
-        pygame.draw.rect(surface, self.color, self.rect)
+        if self.alive == True:
+            pygame.draw.rect(surface, self.color, self.rect)
     
     def collide(self):
         # ============================================
         # TODO: Implement an event when block collides with a ball
-        pass
+        if self.alive == True:
+            self.alive = False
 
 
 class Paddle(Basic):
@@ -68,7 +70,11 @@ class Ball(Basic):
     def collide_block(self, blocks: list):
         # ============================================
         # TODO: Implement an event when the ball hits a block
-        pass
+        for block in blocks:
+            if self.rect.colliderect(block.rect) and block.alive:
+                block.collide()
+                self.dir = 360 - self.dir + random.randint(-5, 5)
+                break
 
     def collide_paddle(self, paddle: Paddle) -> None:
         if self.rect.colliderect(paddle.rect):
@@ -77,12 +83,22 @@ class Ball(Basic):
     def hit_wall(self):
         # ============================================
         # TODO: Implement a service that bounces off when the ball hits the wall
-        pass
+        screen_width, screen_height = config.display_dimension
+        
         # 좌우 벽 충돌
+        if self.rect.left < 0 or self.rect.right > screen_width:
+            self.dir = 180 - self.dir
         
         # 상단 벽 충돌
+        if self.rect.bottom < 0:
+            self.dir = 360 - self.dir
     
     def alive(self):
         # ============================================
         # TODO: Implement a service that returns whether the ball is alive or not
-        pass
+        screen_width, screen_height = config.display_dimension
+
+        if self.rect.top > screen_height:
+            return False
+        return True
+            
