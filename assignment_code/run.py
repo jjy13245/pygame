@@ -80,8 +80,8 @@ def tick():
         item.move()  # 아이템 이동
         if item.check_collision(paddle):  # Paddle과 충돌 처리
             if item.type == "add_ball":  # 예시: add_ball 타입의 아이템일 경우
-                # 공을 추가하는 로직을 삭제했습니다.
-                pass
+                new_ball = Ball()
+                BALLS.append(new_ball)
             ITEMS.remove(item)
         elif item.rect.top > config.display_dimension[1]:  # 화면 아래로 벗어나면 제거
             ITEMS.remove(item)
