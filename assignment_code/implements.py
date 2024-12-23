@@ -1,12 +1,9 @@
 import math
 import random
 import time
-
-import config
-
 import pygame
 from pygame.locals import Rect, K_LEFT, K_RIGHT
-
+import config
 
 class Basic:
     def __init__(self, color: tuple, speed: int = 0, pos: tuple = (0, 0), size: tuple = (0, 0)):
@@ -50,9 +47,9 @@ class Paddle(Basic):
         pygame.draw.rect(surface, self.color, self.rect)
 
     def move_paddle(self, event: pygame.event.Event):
-        if event.key == pygame.K_LEFT and self.rect.left > 0:
+        if event.key == K_LEFT and self.rect.left > 0:
             self.rect.move_ip(-self.speed, 0)
-        elif event.key == pygame.K_RIGHT and self.rect.right < config.display_dimension[0]:
+        elif event.key == K_RIGHT and self.rect.right < config.display_dimension[0]:
             self.rect.move_ip(self.speed, 0)
 
 
@@ -115,4 +112,55 @@ class Item:
     def draw(self, surface):
         # 아이템을 화면에 그리기 (사각형으로 그릴 수 있음)
         pygame.draw.rect(surface, config.item_color, self.rect)
-        
+
+
+# 게임 루프에서 아이템들을 이동시키는 코드 예시 (아이템을 목록으로 관리하는 경우)
+ITEMS = []  # 아이템들을 저장할 리스트
+
+def tick():
+    for item in ITEMS:
+        item.move()  # 아이템을 이동시키는 부분
+    
+    # 추가적인 로직 (충돌 체크 등)
+    for item in ITEMS:
+        if item.check_collision(paddle):  # paddle과 충돌 체크
+            # 충돌 시 아이템 처리
+            pass
+
+def main():
+    # 초기화, pygame 실행 코드
+    pygame.init()
+
+    # Paddle과 Ball 초기화
+    paddle = Paddle()
+    ball = Ball()
+
+    # 아이템 생성 예시
+    item = Item((100, 100))
+    ITEMS.append(item)
+
+    # 게임 루프
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN:
+                paddle.move_paddle(event)
+
+        tick()
+
+        # 화면 업데이트 및 그리기
+        screen.fill((0, 0, 0))  # 화면을 검정색으로 채우기
+        ball.draw(screen)
+        paddle.draw(screen)
+
+        for item in ITEMS:
+            item.draw(screen)  # 모든 아이템 그리기
+
+        pygame.display.flip()  # 화면 업데이트
+
+    pygame.quit()
+
+if __name__ == "__main__":
+    main()
