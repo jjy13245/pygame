@@ -60,6 +60,6 @@ collision_limit = len(colors) - 1
 life = 3
 
 # 아이템 관련 설정 추가
-item_speed = 7  # 아이템이 떨어지는 속도
+item_speed = 5  # 아이템이 떨어지는 속도
 item_color = (255, 50, 0)  # 아이템 색상
 item_spawn_prob = 0.2  # 아이템 생성 확률 (20%)
