@@ -1,10 +1,9 @@
 import sys
-from implements import Basic, Block, Paddle, Ball
+import random
+from implements import Basic, Block, Paddle, Ball, Item
 import config
-
 import pygame
 from pygame.locals import QUIT, Rect, K_ESCAPE, K_SPACE
-
 
 pygame.init()
 pygame.key.set_repeat(3, 3)
@@ -20,7 +19,6 @@ BALLS = [ball1]
 life = config.life
 start = False
 
-
 def create_blocks():
     for i in range(config.num_blocks[0]):
         for j in range(config.num_blocks[1]):
@@ -35,7 +33,6 @@ def create_blocks():
             block = Block(color, (x, y))
             BLOCKS.append(block)
 
-
 def tick():
     global life
     global BLOCKS
@@ -44,15 +41,16 @@ def tick():
     global paddle
     global ball1
     global start
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
         elif event.type == pygame.KEYDOWN:
-            if event.key == K_ESCAPE:  # ESC 키가 눌렸을 때
+            if event.key == K_ESCAPE:
                 pygame.quit()
                 sys.exit()
-            if event.key == K_SPACE:  # space키가 눌려지만 start 변수가 True로 바뀌며 게임 시작
+            if event.key == K_SPACE:
                 start = True
             paddle.move_paddle(event)
 
@@ -69,6 +67,24 @@ def tick():
         if ball.alive() == False:
             BALLS.remove(ball)
 
+    # 블록 충돌 시 아이템 생성
+    for block in BLOCKS:
+        if not block.alive and block in BLOCKS:
+            if random.random() < config.item_spawn_prob:  # 20% 확률로 아이템 생성
+                item = Item(block.pos)  # 아이템 생성
+                ITEMS.append(item)
+            BLOCKS.remove(block)
+
+    # 아이템 처리
+    for item in ITEMS[:]:
+        item.move()  # 아이템 이동
+        if item.check_collision(paddle):  # Paddle과 충돌 처리
+            if item.type == "add_ball":  # 예시: add_ball 타입의 아이템일 경우
+                # 공을 추가하는 로직을 삭제했습니다.
+                pass
+            ITEMS.remove(item)
+        elif item.rect.top > config.display_dimension[1]:  # 화면 아래로 벗어나면 제거
+            ITEMS.remove(item)
 
 def main():
     global life
@@ -78,6 +94,7 @@ def main():
     global paddle
     global ball1
     global start
+
     my_font = pygame.font.SysFont(None, 50)
     mess_clear = my_font.render("Cleared!", True, config.colors[2])
     mess_over = my_font.render("Game Over!", True, config.colors[2])
@@ -91,8 +108,10 @@ def main():
         for block in BLOCKS:
             block.draw(surface)
 
-        cur_score = config.num_blocks[0] * config.num_blocks[1] - len(BLOCKS)
+        for item in ITEMS:
+            item.draw(surface)
 
+        cur_score = config.num_blocks[0] * config.num_blocks[1] - len(BLOCKS)
         score_txt = my_font.render(f"Score : {cur_score * 10}", True, config.colors[2])
         life_font = my_font.render(f"Life: {life}", True, config.colors[0])
 
@@ -119,7 +138,6 @@ def main():
 
         pygame.display.update()
         fps_clock.tick(config.fps)
-
 
 if __name__ == "__main__":
     main()
