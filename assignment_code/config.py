@@ -1,10 +1,10 @@
 # Setting for Blocks
 # Number of blocks
-num_blocks = (5, 3)
+num_blocks = (20, 15)
 # Size of margin
-margin = (60, 40)
+margin = (10, 10)
 # Size of block
-block_size = (80, 30)
+block_size = (40, 10)
 # Spacing between blocks
 spacing = (20, 20)
 score_pos = (10, 10)
@@ -58,3 +58,8 @@ collision_limit = len(colors) - 1
 
 # Total number of life.
 life = 3
+
+# 아이템 관련 설정 추가
+item_speed = 7  # 아이템이 떨어지는 속도
+item_color = (255, 50, 0)  # 아이템 색상
+item_spawn_prob = 0.2  # 아이템 생성 확률 (20%)

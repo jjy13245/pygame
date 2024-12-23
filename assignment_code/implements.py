@@ -25,19 +25,17 @@ class Basic:
 
 
 class Block(Basic):
-    def __init__(self, color: tuple, pos: tuple = (0,0), alive = True):
+    def __init__(self, color: tuple, pos: tuple = (0, 0), alive=True):
         super().__init__(color, 0, pos, config.block_size)
         self.pos = pos
         self.alive = alive
 
     def draw(self, surface) -> None:
-        if self.alive == True:
+        if self.alive:
             pygame.draw.rect(surface, self.color, self.rect)
     
     def collide(self):
-        # ============================================
-        # TODO: Implement an event when block collides with a ball
-        if self.alive == True:
+        if self.alive:
             self.alive = False
 
 
@@ -52,9 +50,9 @@ class Paddle(Basic):
         pygame.draw.rect(surface, self.color, self.rect)
 
     def move_paddle(self, event: pygame.event.Event):
-        if event.key == K_LEFT and self.rect.left > 0:
+        if event.key == pygame.K_LEFT and self.rect.left > 0:
             self.rect.move_ip(-self.speed, 0)
-        elif event.key == K_RIGHT and self.rect.right < config.display_dimension[0]:
+        elif event.key == pygame.K_RIGHT and self.rect.right < config.display_dimension[0]:
             self.rect.move_ip(self.speed, 0)
 
 
@@ -68,8 +66,6 @@ class Ball(Basic):
         pygame.draw.ellipse(surface, self.color, self.rect)
 
     def collide_block(self, blocks: list):
-        # ============================================
-        # TODO: Implement an event when the ball hits a block
         for block in blocks:
             if self.rect.colliderect(block.rect) and block.alive:
                 block.collide()
@@ -81,24 +77,42 @@ class Ball(Basic):
             self.dir = 360 - self.dir + random.randint(-5, 5)
 
     def hit_wall(self):
-        # ============================================
-        # TODO: Implement a service that bounces off when the ball hits the wall
         screen_width, screen_height = config.display_dimension
         
-        # 좌우 벽 충돌
         if self.rect.left < 0 or self.rect.right > screen_width:
             self.dir = 180 - self.dir
         
-        # 상단 벽 충돌
         if self.rect.bottom < 0:
             self.dir = 360 - self.dir
     
     def alive(self):
-        # ============================================
-        # TODO: Implement a service that returns whether the ball is alive or not
         screen_width, screen_height = config.display_dimension
 
         if self.rect.top > screen_height:
             return False
         return True
-            
+
+
+class Item:
+    def __init__(self, pos, item_type="add_ball"):
+        self.pos = pos
+        self.rect = Rect(self.pos[0], self.pos[1], config.item_size[0], config.item_size[1])  # 크기 정의 (config에서 가져올 수 있음)
+        self.type = item_type  # 아이템 종류, 기본값은 'add_ball'
+
+    def __repr__(self):
+        return f"Item({self.pos}, {self.type})"
+    
+    def move(self):
+        # 아이템을 아래로 이동 (속도는 config에서 정의한 값을 사용)
+        self.rect.top += config.item_speed  # 이동 속도는 config에서 설정한 값을 사용
+
+    def check_collision(self, paddle):
+        # Paddle과의 충돌을 확인
+        if self.rect.colliderect(paddle.rect):
+            return True
+        return False
+
+    def draw(self, surface):
+        # 아이템을 화면에 그리기 (사각형으로 그릴 수 있음)
+        pygame.draw.rect(surface, config.item_color, self.rect)
+        
